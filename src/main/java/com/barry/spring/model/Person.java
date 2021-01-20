@@ -2,7 +2,10 @@ package com.barry.spring.model;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -23,6 +26,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Cascade;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -51,6 +55,9 @@ public class Person implements Serializable {
 	@NotBlank
 	@Size(max = 20, min = 3)
 	private String nom;
+	@NotBlank
+	@Size(max = 20, min = 3)
+	private String username;
 
 	@Column(name = "password")
     private String password;
@@ -63,8 +70,13 @@ public class Person implements Serializable {
 	//@Size(min = 1, max = 2, message = "veuillez entrer un 1 ou 2 chiffres maximum")
 	private int age;
 	
+	
+	private String email;
 	@Transient
 	private boolean enabled;
+	
+	@Transient
+	private String token;
 
 	@JsonProperty("roles")
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -75,10 +87,13 @@ public class Person implements Serializable {
             @JoinColumn(name = "role_id") })
 //	@ManyToMany(targetEntity = Role.class,cascade = CascadeType.ALL )
     private Set<Role> roles = new HashSet<>();
-	public Person(String nom ,String fonction,  BigInteger tel, String sexe, int age, String password) {
+	public Person(String nom , String username,String fonction, String email, BigInteger tel, String sexe, int age, String password) {
 		super();
-		this.fonction = fonction;
+		
 		this.nom = nom;
+		this.username = username;
+		this.email = email;
+		this.fonction = fonction;
 		this.tel = tel;
 		this.sexe = sexe;
 		this.age = age;
@@ -144,13 +159,15 @@ public class Person implements Serializable {
 	public String getPassword() {
 		return password;
 	}
+	
+
 
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.isEnabled();
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -171,8 +188,41 @@ public class Person implements Serializable {
 		this.roles = roles;
 	}
 
-	
+	public String getToken() {
+		return token;
+	}
 
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	/**
+	 * @return the username
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+	/**
+	 * @param username the username to set
+	 */
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	/**
+	 * @param email the email to set
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	
 	
 

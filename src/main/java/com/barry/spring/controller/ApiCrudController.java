@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,10 +21,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import com.barry.spring.model.Person;
 import com.barry.spring.model.Role;
+import com.barry.spring.model.RoleName;
+import com.barry.spring.repository.PersonRepositoryInterface;
 import com.barry.spring.repository.RoleRepository;
-import com.barry.spring.request.RegisterForm;
+import com.barry.spring.request.SignUpForm;
 import com.barry.spring.response.ResponseMessage;
 import com.barry.spring.service.PersonServiceInterface;
 
@@ -35,10 +39,14 @@ public class ApiCrudController {
 	
 	@Autowired
 	private PersonServiceInterface personService;
+	@Autowired 
+	private PersonRepositoryInterface userRepository;
+	@Autowired
+	PasswordEncoder encoder;
 	
 	@Autowired
 	private RoleRepository roleRepository;
-	
+
 //	@Autowired
 //	PasswordEncoder encoder;
 	//@PreAuthorize("hasRole('ADMIN')")
@@ -46,6 +54,7 @@ public class ApiCrudController {
 	public List<Person> personList(){
 		
 		return personService.findAll();
+		
 	}
 	//@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@GetMapping("/{id}")
@@ -54,44 +63,56 @@ public class ApiCrudController {
 	}
 	//@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/create")
-	public ResponseEntity<?> create(@RequestBody @Valid RegisterForm personForm ){
-		Person person = new Person(personForm.getNom(), personForm.getFonction(), personForm.getTel(), personForm.getSexe(),
-				personForm.getAge(), personForm.getPassword());
-		
+	public ResponseEntity<?> create(@RequestBody @Valid SignUpForm signUpRequest ){
+		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+			return new ResponseEntity<>(new ResponseMessage("Fail -> Username is already taken!"),
+					HttpStatus.BAD_REQUEST);
+		}
 
-		Set<String> strRoles = personForm.getRoles();
+		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+			return new ResponseEntity<>(new ResponseMessage("Fail -> Email is already in use!"),
+					HttpStatus.BAD_REQUEST);
+		}
+
+		// Creating user's account
+		Person user = new Person(signUpRequest.getName(), signUpRequest.getUsername(),signUpRequest.getFonction() , signUpRequest.getEmail(),
+				signUpRequest.getTel(), signUpRequest.getSexe(), signUpRequest.getAge(),encoder.encode(signUpRequest.getPassword()));
+
+		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
 
 		strRoles.forEach(role -> {
 			switch (role) {
 			case "ADMIN":
-				Role adminRole = roleRepository.findByName("ADMIN")
+				Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
 						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
 				roles.add(adminRole);
 
 				break;
-			case "SUPER_ADMIN":
-				Role superAdminRole = roleRepository.findByName("SUPER_ADMIN")
+			case "SUPER":
+				Role pmRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
 						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(superAdminRole);
+				roles.add(pmRole);
 
 				break;
 			default:
-				Role userRole = roleRepository.findByName("USER")
+				Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
 						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
 				roles.add(userRole);
 			}
 		});
-		person.setRoles(roles);
-		personService.create(person);
-		return new ResponseEntity<>(new ResponseMessage("User registered successfully!"+person.getNom()), HttpStatus.OK);
+
+		user.setRoles(roles);
+		userRepository.save(user);
+
+		return new ResponseEntity<>(new ResponseMessage("User registered successfully!"), HttpStatus.OK);
 	}
 	
 	@PutMapping("/update/{id}")
-	public ResponseEntity<?> update(@RequestBody @Valid RegisterForm personPerson,@PathVariable Integer id){
+	public ResponseEntity<?> update(@RequestBody @Valid SignUpForm personPerson,@PathVariable Integer id){
 		Person newPerson = personService.findById(id);
 		
-		newPerson.setNom(personPerson.getNom());
+		newPerson.setNom(personPerson.getName());
 		newPerson.setPassword(personPerson.getPassword());
 		newPerson.setFonction(personPerson.getFonction());
 		
@@ -99,25 +120,25 @@ public class ApiCrudController {
 		newPerson.setSexe(personPerson.getSexe());
 		newPerson.setAge(personPerson.getAge());
 		
-		Set<String> strRoles = personPerson.getRoles();
+		Set<String> strRoles = personPerson.getRole();
 		Set<Role> roles = new HashSet<>();
 
 		strRoles.forEach(role -> {
 			switch (role) {
 			case "ADMIN":
-				Role adminRole = roleRepository.findByName("ADMIN")
+				Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
 						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
 				roles.add(adminRole);
 
 				break;
-			case "SUPER_ADMIN":
-				Role superAdminRole = roleRepository.findByName("SUPER_ADMIN")
+			case "SUPER":
+				Role pmRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
 						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(superAdminRole);
+				roles.add(pmRole);
 
 				break;
 			default:
-				Role userRole = roleRepository.findByName("USER")
+				Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
 						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
 				roles.add(userRole);
 			}
