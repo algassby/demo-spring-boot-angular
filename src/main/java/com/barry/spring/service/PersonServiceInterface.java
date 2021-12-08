@@ -19,11 +19,11 @@ public interface PersonServiceInterface {
 	
 	public List<Person> findAll();
 	public Person findById(int id);
-	@Query("SELECT p from Person p where p.username=: username ")
-	public Person findByUsername(@Param("username") String name);
+	public Person findByUsername(String name);
+	public List<Person> findByName(String name);
 	public Person create(PersonDto person);
 	public Person create(Person person) ;
-	public Person udpate(Person person);
+	public Person update(Person person);
 	public  void delete(int id);
 	
 	

@@ -57,15 +57,28 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>0.9.0</version>
-        </dependency> 
+        </dependency>
+        <dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-devtools</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
+	<finalName>my-angular-spring-boot</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<artifactId>spring-boot-maven-plugin</artifactId> 
+               <!--   <configuration>
+                    <executable>ng</executable>
+                    <workingDirectory>src/main/resources/static/my-springboot-angular</workingDirectory>
+                    <arguments>
+                        <argument>build</argument>
+                    </arguments>
+                </configuration>-->
 			</plugin>
+           
 		</plugins>
 	</build>
 

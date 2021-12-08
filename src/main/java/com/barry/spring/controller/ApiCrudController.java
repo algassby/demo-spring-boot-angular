@@ -9,12 +9,14 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,14 +49,16 @@ public class ApiCrudController {
 	@Autowired
 	private RoleRepository roleRepository;
 
-//	@Autowired
-//	PasswordEncoder encoder;
-	//@PreAuthorize("hasRole('ADMIN')")
+
+	@PreAuthorize("hasRole('ADMIN') OR hasRole('ROLE_SUPER_ADMIN')")
 	@GetMapping
 	public List<Person> personList(){
-		
 		return personService.findAll();
-		
+	}
+	
+	@GetMapping("/byName")
+	public List<Person> findByName(@RequestParam(required = false) String nom){
+		return personService.findByName(nom);
 	}
 	//@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@GetMapping("/{id}")
@@ -73,34 +77,36 @@ public class ApiCrudController {
 			return new ResponseEntity<>(new ResponseMessage("Fail -> Email is already in use!"),
 					HttpStatus.BAD_REQUEST);
 		}
-
+		System.out.println(signUpRequest);
 		// Creating user's account
-		Person user = new Person(signUpRequest.getName(), signUpRequest.getUsername(),signUpRequest.getFonction() , signUpRequest.getEmail(),
+		Person user = new Person(signUpRequest.getNom(), signUpRequest.getUsername(),signUpRequest.getFonction() , signUpRequest.getEmail(),
 				signUpRequest.getTel(), signUpRequest.getSexe(), signUpRequest.getAge(),encoder.encode(signUpRequest.getPassword()));
 
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
-
-		strRoles.forEach(role -> {
-			switch (role) {
-			case "ADMIN":
-				Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(adminRole);
-
-				break;
-			case "SUPER":
-				Role pmRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(pmRole);
-
-				break;
-			default:
-				Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(userRole);
-			}
-		});
+		Role roleUser = roleRepository.findByName(RoleName.ROLE_USER).get();
+		roles.add(roleUser);
+//
+//		strRoles.forEach(role -> {
+//			switch (role) {
+//			case "ADMIN":
+//				Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+//						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+//				roles.add(adminRole);
+//
+//				break;
+//			case "SUPER":
+//				Role pmRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
+//						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+//				roles.add(pmRole);
+//
+//				break;
+//			default:
+//				Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+//						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+//				roles.add(userRole);
+//			}
+//		});
 
 		user.setRoles(roles);
 		userRepository.save(user);
@@ -112,9 +118,11 @@ public class ApiCrudController {
 	public ResponseEntity<?> update(@RequestBody @Valid SignUpForm personPerson,@PathVariable Integer id){
 		Person newPerson = personService.findById(id);
 		
-		newPerson.setNom(personPerson.getName());
+		newPerson.setNom(personPerson.getNom());
 		newPerson.setPassword(personPerson.getPassword());
 		newPerson.setFonction(personPerson.getFonction());
+		newPerson.setEmail(personPerson.getEmail());
+		newPerson.setUsername(personPerson.getUsername());
 		
 		newPerson.setTel(personPerson.getTel());
 		newPerson.setSexe(personPerson.getSexe());
@@ -143,8 +151,8 @@ public class ApiCrudController {
 				roles.add(userRole);
 			}
 		});
-		
-		personService.udpate(newPerson);
+		newPerson.setRoles(roles);
+		personService.update(newPerson);
 		return new ResponseEntity<> (new ResponseMessage("Update successfully"), HttpStatus.OK);
 	}
 	@DeleteMapping("/delete/{id}")

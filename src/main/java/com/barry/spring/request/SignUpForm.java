@@ -6,17 +6,13 @@ import java.util.Set;
 import javax.validation.constraints.*;
 
 public class SignUpForm {
-    @NotBlank
-    @Size(min = 3, max = 50)
-    private String name;
 
-    @NotBlank
-    @Size(min = 3, max = 50)
+    private String nom;
+
+  
     private String username;
 
-    @NotBlank
-    @Size(max = 60)
-    @Email
+  
     private String email;
     
     
@@ -29,16 +25,16 @@ public class SignUpForm {
     
     private Set<String> role;
     
-    @NotBlank
-    @Size(min = 6, max = 40)
+    
+    
     private String password;
 
-    public String getName() {
-        return name;
+    public String getNom() {
+        return nom;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     public String getUsername() {
@@ -128,6 +124,14 @@ public class SignUpForm {
 	public void setAge(int age) {
 		this.age = age;
 	}
+
+	@Override
+	public String toString() {
+		return "SignUpForm [name=" + nom + ", username=" + username + ", email=" + email + ", fonction=" + fonction
+				+ ", sexe=" + sexe + ", tel=" + tel + ", age=" + age + ", role=" + role + ", password=" + password
+				+ "]";
+	}
+	
     
     
 }

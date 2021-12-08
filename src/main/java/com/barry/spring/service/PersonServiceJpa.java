@@ -32,7 +32,7 @@ public class PersonServiceJpa implements PersonServiceInterface {
 	}
 
 	@Override
-	public Person udpate(Person person) {
+	public Person update(Person person) {
 		return personRepository.save(person);
 	}
 
@@ -52,6 +52,12 @@ public class PersonServiceJpa implements PersonServiceInterface {
 	public Person create(PersonDto person) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<Person> findByName(String name) {
+		
+		return personRepository.findByName(name);
 	}
 
 	

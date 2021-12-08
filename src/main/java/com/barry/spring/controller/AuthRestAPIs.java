@@ -80,33 +80,34 @@ public class AuthRestAPIs {
 		}
 
 		// Creating user's account
-		Person user = new Person(signUpRequest.getName(), signUpRequest.getUsername(),signUpRequest.getFonction() , signUpRequest.getEmail(),
+		Person user = new Person(signUpRequest.getNom(), signUpRequest.getUsername(),signUpRequest.getFonction() , signUpRequest.getEmail(),
 				signUpRequest.getTel(), signUpRequest.getSexe(), signUpRequest.getAge(),encoder.encode(signUpRequest.getPassword()));
 
 		Set<String> strRoles = signUpRequest.getRole();
+		Role userRole = roleRepository.findByName(RoleName.ROLE_USER).get();
 		Set<Role> roles = new HashSet<>();
 
-		strRoles.forEach(role -> {
-			switch (role) {
-			case "ADMIN":
-				Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(adminRole);
-
-				break;
-			case "SUPER":
-				Role pmRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(pmRole);
-
-				break;
-			default:
-				Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-				roles.add(userRole);
-			}
-		});
-
+//		strRoles.forEach(role -> {
+//			switch (role) {
+//			case "ADMIN":
+//				Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+//						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+//				roles.add(adminRole);
+//
+//				break;
+//			case "SUPER":
+//				Role pmRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
+//						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+//				roles.add(pmRole);
+//
+//				break;
+//			default:
+//				Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+//						.orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+//				roles.add(userRole);
+//			}
+//		});
+		roles.add(userRole);
 		user.setRoles(roles);
 		userRepository.save(user);
 

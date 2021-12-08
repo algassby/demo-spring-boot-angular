@@ -48,18 +48,15 @@ public class Person implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 
-	@NotBlank
-	@Size(max = 30, min = 3)
+	
 	private String fonction;
 
-	@NotBlank
-	@Size(max = 20, min = 3)
+	
 	private String nom;
-	@NotBlank
-	@Size(max = 20, min = 3)
+
 	private String username;
 
-	@Column(name = "password")
+	
     private String password;
 	//@Positive(message = "le champ doit être positif")
 	//@Size(max = 10, min = 10, message = "veuiller respecter le format souhaité, 10 min ou max svp!")
@@ -165,14 +162,14 @@ public class Person implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	public boolean isEnabled() {
-		return this.isEnabled();
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+//
+//	public boolean isEnabled() {
+//		return this.isEnabled();
+//	}
+//
+//	public void setEnabled(boolean enabled) {
+//		this.enabled = enabled;
+//	}
 
 	/**
 	 * @return the roles
