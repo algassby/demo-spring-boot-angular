@@ -29,6 +29,7 @@ import org.hibernate.annotations.Cascade;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 
 /**
@@ -48,15 +49,13 @@ public class Person implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 
-	
 	private String fonction;
 
-	
 	private String nom;
-
-	private String username;
-
 	
+	private String username;
+	private String imageName;
+	@JsonProperty(access = Access.WRITE_ONLY)
     private String password;
 	//@Positive(message = "le champ doit être positif")
 	//@Size(max = 10, min = 10, message = "veuiller respecter le format souhaité, 10 min ou max svp!")
@@ -100,6 +99,10 @@ public class Person implements Serializable {
 	}
 
 	public Person() {
+	}
+
+	public Person(String imageName) {
+		this.imageName = imageName;
 	}
 
 	public int getId() {
@@ -219,6 +222,20 @@ public class Person implements Serializable {
 	 */
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	/**
+	 * @return the imageName
+	 */
+	public String getImageName() {
+		return imageName;
+	}
+
+	/**
+	 * @param imageName the imageName to set
+	 */
+	public void setImageName(String imageName) {
+		this.imageName = imageName;
 	}
 	
 	

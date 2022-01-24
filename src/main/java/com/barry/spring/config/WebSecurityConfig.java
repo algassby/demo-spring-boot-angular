@@ -20,9 +20,9 @@ import com.barry.spring.service.UserDetailsServiceImpl;
 @Configuration
 @EnableWebSecurity
 @EnableWebMvc
-@EnableGlobalMethodSecurity(
-		prePostEnabled = true
-)
+//@EnableGlobalMethodSecurity(
+//		prePostEnabled = true
+//)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserDetailsServiceImpl userDetailsService;

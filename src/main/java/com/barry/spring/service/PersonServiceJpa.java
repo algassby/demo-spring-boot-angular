@@ -3,14 +3,18 @@ package com.barry.spring.service;
 import java.util.List;
 import java.util.Optional;
 
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.barry.spring.model.Person;
 import com.barry.spring.model.PersonDto;
 import com.barry.spring.repository.PersonRepositoryInterface;
 
 @Service
+@Transactional
 public class PersonServiceJpa implements PersonServiceInterface {
 
 	@Autowired
@@ -29,6 +33,7 @@ public class PersonServiceJpa implements PersonServiceInterface {
 	@Override
 	public Person create(Person person) {
 		return personRepository.save(person);
+		
 	}
 
 	@Override

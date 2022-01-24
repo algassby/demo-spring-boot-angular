@@ -31,7 +31,7 @@ import com.barry.spring.request.SignUpForm;
 import com.barry.spring.response.JwtResponse;
 import com.barry.spring.response.ResponseMessage;
 
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600,allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthRestAPIs {
